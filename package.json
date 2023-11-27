@@ -1,0 +1,29 @@
+{
+  "name": "QualiWatchPc",
+  "version": "0.0.0",
+  "description": "",
+  "scripts": {
+    "start": "vite",
+    "dev": "vite",
+    "build": "vite build",
+    "serve": "vite preview",
+    "tauri": "tauri"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@solidjs/router": "^0.9.1",
+    "@tauri-apps/api": "^1.5.1",
+    "solid-js": "^1.8.6",
+    "tauri-plugin-store-api": "github:tauri-apps/tauri-plugin-store#v1"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^1.5.6",
+    "autoprefixer": "^10.4.16",
+    "daisyui": "^4.4.10",
+    "postcss": "^8.4.31",
+    "tailwindcss": "^3.3.5",
+    "typescript": "^5.3.2",
+    "vite": "^4.5.0",
+    "vite-plugin-solid": "^2.7.2"
+  }
+}

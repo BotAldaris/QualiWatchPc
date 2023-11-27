@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@layer utilities {
+    .entrada {
+        @apply input input-bordered input-primary w-full;
+    }
+
+    .botao {
+        @apply btn btn-outline rounded-full;
+    }
+    .gas{
+        padding: 5%;
+    }
+    .img{
+        @apply h-6 w-6
+    }
+    .inputdiv{
+        @apply flex gap-2 flex-col
+    }
+    
+}
+.active {
+    fill: blueviolet;
+    color: blueviolet;
+}
