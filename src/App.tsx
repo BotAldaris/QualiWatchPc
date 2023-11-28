@@ -4,16 +4,16 @@ import { lazy, onMount } from "solid-js";
 import AppBar from "./components/AppBar";
 import EditarProduto, { ProdutoData } from "./screens/Products/pages/Editar";
 import { useTema } from "./contexts/TemaContext";
-import Alertas from "./screens/Alertas";
+import { atualizarListaProdutosPertodeVencer } from "./services/Produto";
 const Produtos = lazy(() => import("./screens/Products/"));
 const AdicionarProduto = lazy(
   () => import("./screens/Products/pages/Adicionar")
 );
 const Configuracao = lazy(() => import("./screens/Configuracao"));
-
+const Alertas = lazy(() => import("./screens/Alertas"));
 function App() {
-  onMount(() => {
-    alert("OI");
+  onMount(async () => {
+    await atualizarListaProdutosPertodeVencer();
   });
   const { tema } = useTema()!;
   return (

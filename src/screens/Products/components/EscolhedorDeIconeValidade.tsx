@@ -4,10 +4,8 @@ interface IProps {
 }
 
 const EscolhedorDeIconeValidade: Component<IProps> = (props) => {
-  console.log(props.validade);
   const diasFaltando =
     (props.validade.getTime() - Date.now()) / (1000 * 60 * 60 * 24);
-  console.log(diasFaltando);
   return (
     <div class="w-12 grid justify-center ">
       <Switch

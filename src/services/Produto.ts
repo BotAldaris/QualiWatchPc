@@ -4,10 +4,14 @@ import ICreateProduto from "../interfaces/Produtos/CreateProduto";
 import IReadProdutoApi from "../interfaces/Produtos/ReadProdutoApi";
 import { Store } from "tauri-plugin-store-api";
 
-const store = new Store(".settings.dat");
+const storeUrl = new Store(".settings.dat");
+const storeValidade = new Store(".validade.dat");
 
 const baseUrl = async () => {
-  const base = await store.get("url");
+  const base = await storeUrl.get("url");
+  if (!base) {
+    throw new Error("registre uma url");
+  }
   const result = `${base}/Produtos`;
   return result;
 };
@@ -24,14 +28,7 @@ export async function readProduto(): Promise<IReadProduto[]> {
       throw new Error("erro status: " + response.status);
     }
     const produtoSemDataFormatada = response.data as IReadProdutoApi[];
-    const result = [] as IReadProduto[];
-    produtoSemDataFormatada.forEach((produto) => {
-      const novoProduto = {
-        ...produto,
-        validade: new Date(produto.validade),
-      };
-      result.push(novoProduto);
-    });
+    const result = converterApiparaProduto(produtoSemDataFormatada);
     return result;
   } catch (e) {
     console.log(e);
@@ -110,25 +107,62 @@ export async function atualizarListaProdutosPertodeVencer() {
   try {
     const client = await getClient();
     const base = await baseUrl();
-    const response = await client.get<IReadProdutoApi[]>(base, {
-      timeout: 180,
-      responseType: ResponseType.JSON,
-    });
+    const body = await criarBodyComValidade();
+    console.log(body);
+    const response = await client.post<IReadProdutoApi[]>(
+      base + "/validade",
+      body,
+      { responseType: ResponseType.JSON }
+    );
     if (!response.ok) {
       throw new Error("erro status: " + response.status);
     }
     const produtoSemDataFormatada = response.data as IReadProdutoApi[];
-    const result = [] as IReadProduto[];
-    produtoSemDataFormatada.forEach((produto) => {
-      const novoProduto = {
-        ...produto,
-        validade: new Date(produto.validade),
-      };
-      result.push(novoProduto);
-    });
-    return result;
+    console.log(produtoSemDataFormatada);
+    const produtos = await getListaProdutosPertoDeVencerApi();
+    produtoSemDataFormatada.forEach((p) => produtos.push(p));
+    storeValidade.set("validades", produtos);
   } catch (e) {
-    console.log(e);
+    alert(e);
     throw new Error("Erro ao pegar os produtos, erro: " + e);
   }
+}
+
+export async function getListaProdutosPertoDeVencerApi(): Promise<
+  IReadProdutoApi[]
+> {
+  if (await storeValidade.has("validades")) {
+    const dados = (await storeValidade.get("validades")) as IReadProdutoApi[];
+    return dados;
+  }
+  return [] as IReadProdutoApi[];
+}
+
+function converterApiparaProduto(
+  produtosApi: IReadProdutoApi[]
+): IReadProduto[] {
+  const result = [] as IReadProduto[];
+  produtosApi.forEach((produto) => {
+    const novoProduto = {
+      ...produto,
+      validade: new Date(produto.validade),
+    };
+    result.push(novoProduto);
+  });
+  return result;
+}
+
+export async function getListaProdutosPertoDeVencer(): Promise<IReadProduto[]> {
+  const produtosSemDataFormatada = await getListaProdutosPertoDeVencerApi();
+  const result = converterApiparaProduto(produtosSemDataFormatada);
+  return result;
+}
+
+async function criarBodyComValidade(): Promise<Body> {
+  const validade = await storeValidade.get("ultimaAtulizacao");
+  await storeValidade.set("ultimaAtulizacao", new Date());
+  if (validade) {
+    return Body.json({ ultimaAtulizacao: validade });
+  }
+  return Body.json({});
 }
