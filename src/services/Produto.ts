@@ -108,7 +108,7 @@ export async function atualizarListaProdutosPertodeVencer() {
     const client = await getClient();
     const base = await baseUrl();
     const body = await criarBodyComValidade();
-    console.log(body);
+    const data = new Date();
     const response = await client.post<IReadProdutoApi[]>(
       base + "/validade",
       body,
@@ -118,8 +118,8 @@ export async function atualizarListaProdutosPertodeVencer() {
       throw new Error("erro status: " + response.status);
     }
     const produtoSemDataFormatada = response.data as IReadProdutoApi[];
-    console.log(produtoSemDataFormatada);
     const produtos = await getListaProdutosPertoDeVencerApi();
+    await storeValidade.set("ultimaAtulizacao", data);
     produtoSemDataFormatada.forEach((p) => produtos.push(p));
     storeValidade.set("validades", produtos);
   } catch (e) {
@@ -160,7 +160,6 @@ export async function getListaProdutosPertoDeVencer(): Promise<IReadProduto[]> {
 
 async function criarBodyComValidade(): Promise<Body> {
   const validade = await storeValidade.get("ultimaAtulizacao");
-  await storeValidade.set("ultimaAtulizacao", new Date());
   if (validade) {
     return Body.json({ ultimaAtulizacao: validade });
   }
