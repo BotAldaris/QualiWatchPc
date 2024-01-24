@@ -1,10 +1,11 @@
-import { NavLink } from "@solidjs/router";
+
+import { A } from "@solidjs/router";
 import { Component } from "solid-js";
 
 const AppBar: Component = () => {
   return (
     <nav class="btm-nav">
-      <NavLink end={true} href="/">
+      <A href="/produtos">
         <div class="flex flex-col items-center">
           <svg
             class="img"
@@ -15,8 +16,8 @@ const AppBar: Component = () => {
           </svg>
           <p>Produtos</p>
         </div>
-      </NavLink>
-      <NavLink href="/configuracao">
+      </A>
+      <A href="/configuracao">
         <div class="flex flex-col items-center">
           <svg
             class="img"
@@ -27,8 +28,8 @@ const AppBar: Component = () => {
           </svg>
           <span class="btm-nav-label">Configuração</span>
         </div>
-      </NavLink>
-      <NavLink href="/alertas">
+      </A>
+      <A href="/alertas">
         <div class="flex flex-col items-center">
           <svg
             class="img"
@@ -40,7 +41,7 @@ const AppBar: Component = () => {
           </svg>
           <span class="btm-nav-label">Alertas</span>
         </div>
-      </NavLink>
+      </A>
     </nav>
   );
 };

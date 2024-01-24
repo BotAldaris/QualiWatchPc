@@ -36,6 +36,15 @@ export async function readProduto(): Promise<IReadProduto[]> {
   }
 }
 export async function readProdutoByIdApi(id: string): Promise<IReadProduto> {
+  if (id == "-1") {
+    const produto = {
+      nome: "",
+      lote: "",
+      id: "-1",
+      validade: new Date(),
+    };
+    return produto;
+  }
   try {
     const client = await getClient();
     const base = await baseUrl();

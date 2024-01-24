@@ -9,7 +9,7 @@ const Header: Component = () => {
           <h1 class="text-2xl">Produto</h1>
         </div>
         <div class="flex-none">
-          <A class="btn btn-square btn-ghost" href="/produtos/adicionar">
+          <A class="btn btn-square btn-ghost" href="/produtos/editar/-1">
             <svg
               class="w-7 h-7 xl:h-8 xl:w-8 fill-accent"
               fill="none"
