@@ -112,12 +112,11 @@ export async function deleteProdutoApi(id: string) {
   }
 }
 
-export async function atualizarListaProdutosPertodeVencer() {
+export async function getListaProdutosPertoDeVencer(): Promise<IReadProduto[]> {
   try {
     const client = await getClient();
     const base = await baseUrl();
     const body = await criarBodyComValidade();
-    const data = new Date();
     const response = await client.post<IReadProdutoApi[]>(
       base + "/validade",
       body,
@@ -127,24 +126,12 @@ export async function atualizarListaProdutosPertodeVencer() {
       throw new Error("erro status: " + response.status);
     }
     const produtoSemDataFormatada = response.data as IReadProdutoApi[];
-    const produtos = await getListaProdutosPertoDeVencerApi();
-    await storeValidade.set("ultimaAtulizacao", data);
-    produtoSemDataFormatada.forEach((p) => produtos.push(p));
-    storeValidade.set("validades", produtos);
+    const result = converterApiparaProduto(produtoSemDataFormatada);
+    return result;
   } catch (e) {
-    alert(e);
-    throw new Error("Erro ao pegar os produtos, erro: " + e);
+    alert("Erro ao pegar os produtos, erro: " + e);
   }
-}
-
-export async function getListaProdutosPertoDeVencerApi(): Promise<
-  IReadProdutoApi[]
-> {
-  if (await storeValidade.has("validades")) {
-    const dados = (await storeValidade.get("validades")) as IReadProdutoApi[];
-    return dados;
-  }
-  return [] as IReadProdutoApi[];
+  return [];
 }
 
 function converterApiparaProduto(
@@ -161,16 +148,6 @@ function converterApiparaProduto(
   return result;
 }
 
-export async function getListaProdutosPertoDeVencer(): Promise<IReadProduto[]> {
-  const produtosSemDataFormatada = await getListaProdutosPertoDeVencerApi();
-  const result = converterApiparaProduto(produtosSemDataFormatada);
-  return result;
-}
-
 async function criarBodyComValidade(): Promise<Body> {
-  const validade = await storeValidade.get("ultimaAtulizacao");
-  if (validade) {
-    return Body.json({ ultimaAtulizacao: validade });
-  }
   return Body.json({});
 }
