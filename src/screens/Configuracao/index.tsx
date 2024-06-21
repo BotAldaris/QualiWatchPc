@@ -1,9 +1,9 @@
-import { message } from "@tauri-apps/api/dialog";
+import { message } from "@tauri-apps/plugin-dialog";
 import { Component, createSignal, onMount } from "solid-js";
-import { Store } from "tauri-plugin-store-api";
+import { Store } from "@tauri-apps/plugin-store";
 import { useTema } from "../../contexts/TemaContext";
 
-const Configuracao:Component = () => {
+const Configuracao: Component = () => {
   const store = new Store(".settings.dat");
   const [url, setUrl] = createSignal("");
   const fetchData = async () => {

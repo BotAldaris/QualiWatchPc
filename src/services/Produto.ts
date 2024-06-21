@@ -1,33 +1,28 @@
-import { ResponseType, getClient, Body } from "@tauri-apps/api/http";
+import { fetch } from "@tauri-apps/plugin-http";
 import IReadProduto from "../interfaces/Produtos/ReadProduto";
 import ICreateProduto from "../interfaces/Produtos/CreateProduto";
 import IReadProdutoApi from "../interfaces/Produtos/ReadProdutoApi";
-import { Store } from "tauri-plugin-store-api";
+import { Store } from "@tauri-apps/plugin-store";
 
-const storeUrl = new Store(".settings.dat");
-const storeValidade = new Store(".validade.dat");
+export const storeUrl = new Store(".settings.dat");
 
 const baseUrl = async () => {
   const base = await storeUrl.get("url");
   if (!base) {
     throw new Error("registre uma url");
   }
-  const result = `${base}/Produtos`;
+  const result = `${base}/api/Produtos`;
   return result;
 };
-
 export async function readProduto(): Promise<IReadProduto[]> {
   try {
-    const client = await getClient();
     const base = await baseUrl();
-    const response = await client.get<IReadProdutoApi[]>(base, {
-      timeout: 180,
-      responseType: ResponseType.JSON,
-    });
+    const response = await fetch(base);
     if (!response.ok) {
       throw new Error("erro status: " + response.status);
     }
-    const produtoSemDataFormatada = response.data as IReadProdutoApi[];
+    const produtoSemDataFormatada =
+      (await response.json()) as IReadProdutoApi[];
     const result = converterApiparaProduto(produtoSemDataFormatada);
     return result;
   } catch (e) {
@@ -46,17 +41,13 @@ export async function readProdutoByIdApi(id: string): Promise<IReadProduto> {
     return produto;
   }
   try {
-    const client = await getClient();
     const base = await baseUrl();
     let s = base + "/" + id;
-    const response = await client.get<IReadProdutoApi>(s, {
-      timeout: 180,
-      responseType: ResponseType.JSON,
-    });
+    const response = await fetch(s);
     if (response.status > 300) {
       throw new Error("erro status: " + response.status);
     }
-    const produto = response.data as IReadProdutoApi;
+    const produto = (await response.json()) as IReadProdutoApi;
     const novoProduto = {
       ...produto,
       validade: new Date(produto.validade),
@@ -69,11 +60,15 @@ export async function readProdutoByIdApi(id: string): Promise<IReadProduto> {
 }
 export async function saveProdutoApi(produto: ICreateProduto) {
   try {
-    const client = await getClient();
     const base = await baseUrl();
-    const body = Body.json(produto);
-    console.log(produto.validade.toUTCString());
-    const response = await client.post(base, body);
+    const body = JSON.stringify(produto);
+    const response = await fetch(base, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: body,
+    });
     if (!response.ok) {
       throw new Error(
         "Erro ao adicionar o produto, Status: " + response.status
@@ -85,10 +80,16 @@ export async function saveProdutoApi(produto: ICreateProduto) {
 }
 export async function putProdutoApi(produto: ICreateProduto, id: string) {
   try {
-    const client = await getClient();
-    const base = await baseUrl();
-    const body = Body.json(produto);
-    const response = await client.put(`${base}/${id}`, body);
+    let base = await baseUrl();
+    base += "/" + id;
+    const body = JSON.stringify(produto);
+    const response = await fetch(base, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: body,
+    });
     if (!response.ok) {
       throw new Error(
         "Erro ao atualizar o produto, Status: " + response.status
@@ -100,9 +101,9 @@ export async function putProdutoApi(produto: ICreateProduto, id: string) {
 }
 export async function deleteProdutoApi(id: string) {
   try {
-    const client = await getClient();
-    const base = await baseUrl();
-    const response = await client.delete(`${base}/${id}`);
+    let base = await baseUrl();
+    base += "/" + id;
+    const response = await fetch(base, { method: "DELETE" });
     if (!response.ok) {
       alert(response.status);
       throw new Error("Erro ao deletar o produto, Status: " + response.status);
@@ -114,18 +115,20 @@ export async function deleteProdutoApi(id: string) {
 
 export async function getListaProdutosPertoDeVencer(): Promise<IReadProduto[]> {
   try {
-    const client = await getClient();
     const base = await baseUrl();
-    const body = await criarBodyComValidade();
-    const response = await client.post<IReadProdutoApi[]>(
-      base + "/validade",
-      body,
-      { responseType: ResponseType.JSON }
-    );
+    const body = await JSON.stringify({});
+    const response = await fetch(base + "/validade", {
+      body: body,
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
     if (!response.ok) {
       throw new Error("erro status: " + response.status);
     }
-    const produtoSemDataFormatada = response.data as IReadProdutoApi[];
+    const produtoSemDataFormatada =
+      (await response.json()) as IReadProdutoApi[];
     const result = converterApiparaProduto(produtoSemDataFormatada);
     return result;
   } catch (e) {
@@ -146,8 +149,4 @@ function converterApiparaProduto(
     result.push(novoProduto);
   });
   return result;
-}
-
-async function criarBodyComValidade(): Promise<Body> {
-  return Body.json({});
 }

@@ -11,6 +11,7 @@ const Produtos = lazy(() => import("./screens/Products/"));
 const Configuracao = lazy(() => import("./screens/Configuracao"));
 const Alertas = lazy(() => import("./screens/Alertas"));
 const EditarProduto = lazy(() => import("./screens/Products/pages/AdicionarEditar"))
+const Estatistica = lazy(() => import("./screens/Estatisticas"))
 render(
   () => (
   <TemaContextProvider>
@@ -24,6 +25,7 @@ render(
               load={loadProduto}
             />
             <Route path="/alertas" component={Alertas} />
+            <Route path="/estatisticas" component={Estatistica}/>
     </Router>
       </TemaContextProvider>
   ),

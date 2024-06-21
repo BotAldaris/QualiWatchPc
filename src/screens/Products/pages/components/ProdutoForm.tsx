@@ -3,7 +3,7 @@ import IReadProduto from "../../../../interfaces/Produtos/ReadProduto";
 import { createStore } from "solid-js/store";
 import { putProdutoApi, saveProdutoApi } from "../../../../services/Produto";
 import { useNavigate } from "@solidjs/router";
-import { message } from "@tauri-apps/api/dialog";
+import { message } from "@tauri-apps/plugin-dialog";
 
 interface IProps {
   produtoApi: IReadProduto;

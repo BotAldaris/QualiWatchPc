@@ -7,7 +7,7 @@ import {
   onMount,
   useContext,
 } from "solid-js";
-import { Store } from "tauri-plugin-store-api";
+import { Store } from "@tauri-apps/plugin-store";
 
 interface IProps {
   children: JSX.Element;
