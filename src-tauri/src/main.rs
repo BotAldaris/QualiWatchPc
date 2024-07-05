@@ -4,7 +4,6 @@ use std::str::FromStr;
 
 use polars::{
     df,
-    error::PolarsError,
     frame::DataFrame,
     lazy::dsl::col,
     prelude::{IntoLazy, SortMultipleOptions},

@@ -1,6 +1,6 @@
 import { Component, onMount } from "solid-js";
 import { Chart, Title, Tooltip, Legend, Colors } from "chart.js";
-import { Bar } from "solid-chartjs";
+import { Line } from "solid-chartjs";
 
 interface IProps {
   data: number[];
@@ -29,7 +29,7 @@ const BarChart: Component<IProps> = (props) => {
 
   return (
     <div>
-      <Bar data={chartData} options={chartOptions} width={500} height={500} />
+      <Line data={chartData} options={chartOptions} width={500} height={500} />
     </div>
   );
 };
